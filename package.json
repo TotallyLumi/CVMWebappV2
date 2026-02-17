@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "CollabVM Webapp created in TailWindCSS",
   "author": "totallylumi",
+  "type": "module",
   "scripts": {
     "build:css": "tailwindcss -i ./src/css/input.css -o ./src/css/style.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
