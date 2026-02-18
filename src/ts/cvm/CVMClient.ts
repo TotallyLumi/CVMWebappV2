@@ -304,6 +304,87 @@ export default class CVMClient {
 
 				this.publicEmitter.emit('rename', oldUsername, newUsername, selfRename);
 			}
+			case 'turn': {
+				for (const user of this.users.values()) {
+					user.turn = -1;
+				}
+
+				const queuedUsers = Number(msgArr[2]);
+				const currentUsername = msgArr[3];
+
+				if (!queuedUsers || !currentUsername) {
+					this.publicEmitter.emit('turn', {
+						user: null,
+						queue: [],
+						turnTime: null,
+						queueTime: null
+					});
+					return;
+				}
+
+				const currentTurn = this.users.get(currentUsername);
+				if (!currentTurn) return;
+
+				currentTurn.turn = 0;
+
+				const queue: User[] = [];
+
+				for (let i = 1; i < queuedUsers; i++) {
+					const username = msgArr[i + 3];
+					if (!username) continue;
+
+					const user = this.users.get(username);
+					if (!user) continue;
+
+					user.turn = i;
+					queue.push(user);
+				}
+
+				const turnTime =
+				currentTurn.username === this.username
+					? Number(msgArr[1])
+					: null;
+
+				const queueTime =
+					queue.some(u => u.username === this.username)
+						? Number(msgArr[msgArr.length - 1])
+						: null;
+
+				this.publicEmitter.emit('turn', {
+					user: currentTurn,
+					queue,
+					turnTime,
+					queueTime
+				});
+			}
+			case 'vote': {
+
+			}
+			// case 'auth': {
+
+			// }
+			// case 'login': {
+
+			// }
+			case 'admin': {
+
+			}
+			// case 'flag': {
+			// 	for (let i = 1; i + 1 < msgArr.length; i += 2) {
+			// 		const username = msgArr[i];
+			// 		const countryCode = msgArr[i + 1];
+
+			// 		if (!username || !countryCode) continue;
+
+			// 		const user = this.users.get(username);
+
+			// 		if (user) {
+			// 			user.countryCode = countryCode;
+			// 		}
+			// 	}
+
+			// 	this.publicEmitter.emit('flag');
+			// }
 		}
 	}
 }
