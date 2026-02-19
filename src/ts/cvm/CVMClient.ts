@@ -6,6 +6,7 @@ import * as Guacutils from "./Guacutils.js";
 import type VM from "./VM.js";
 import type VoteStatus from "./VoteStatus.js";
 import type TurnStatus from "./TurnStatus.js";
+import type { StringLike } from "../StringLike.js";
 import { CollabVMProtocolMessageType, type CollabVMProtocolMessage } from "../protocol/CollabVMProtocolMessage.js";
 
 import { User } from "./User.js";
@@ -451,6 +452,55 @@ export default class CVMClient {
 			(img.width / this.actualScreenSize.width) * this.canvas.width,
 			(img.height / this.actualScreenSize.height) * this.canvas.height
 		);
+	}
+
+	private onWindowResize(e: Event) {
+		if (!this.connectedToVM) return;
+		if (window.innerWidth >= this.actualScreenSize.width && this.canvas.width === this.actualScreenSize.width) return;
+		if (this.actualScreenSize.width === this.canvasScale.width && this.actualScreenSize.height === this.canvasScale.height) {
+			this.unscaledCtx.drawImage(this.canvas, 0, 0);
+		}
+
+		this.recalculateCanvasScale(this.actualScreenSize.width, this.actualScreenSize.height);
+
+		this.canvas.width = this.canvasScale.width;
+		this.canvas.height = this.canvasScale.height;
+
+		this.ctx.drawImage(this.unscaledCanvas, 0, 0, this.actualScreenSize.width, this.actualScreenSize.height, 0, 0, this.canvas.width, this.canvas.height);
+	}
+
+	private recalculateCanvasScale(width: number, height: number) {
+		this.actualScreenSize.width = width;
+		this.actualScreenSize.height = height;
+
+		if (window.innerWidth >= this.actualScreenSize.width) {
+			this.canvasScale.width = this.actualScreenSize.width;
+			this.canvasScale.height = this.actualScreenSize.height;
+		} else {
+			this.canvasScale.width = window.innerWidth;
+			this.canvasScale.height = (window.innerWidth / this.actualScreenSize.width) * this.actualScreenSize.height;
+		}
+	}
+
+	async WaitForOpen() {
+		return new Promise<void>((res) => {
+			let unsub = this.onInternal('open', () => {
+				unsub();
+				res();
+			});
+		});
+	}
+
+	send(...args: StringLike[]) {
+		let guacElements = [...args].map((el) => {
+			if (typeof el == 'string') return el as string;
+
+			return el.toString();
+		});
+		this.socket.send(Guacutils.encode(...guacElements));
+	}
+
+	list(): Promise<VM[]> {
 
 	}
 }
