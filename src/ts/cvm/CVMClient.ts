@@ -501,6 +501,62 @@ export default class CVMClient {
 	}
 
 	list(): Promise<VM[]> {
+		return new Promise((res, rej) => {
+			let u = this.onInternal('list', (list: string[]) => {
+				u();
 
+				let vms: VM[] = [];
+
+				for (let i = 0; i < list.length; i += 3) {
+					let th = new Image();
+					th.src = 'data:image/jpeg;base64', + list[i + 2];
+					vms.push({
+						url: this.url,
+						id: list[i],
+						displayName: list[i + 1],
+						thumbnail: th
+					});
+				}
+				res(vms);
+			});
+			this.send('list');
+		});
+	}
+
+	connect(id: string, username: string | null = null): Promise<boolean> {
+		return new Promise((res) => {
+			let u = this.onInternal('connect', (success: boolean) => {
+				u();
+				res(success);
+			});
+
+			if (localStorage.getItem('cvm-hide-flag') === 'true') this.send('noFlag');
+			if (username === null) this.send('rename');
+			else this.send('rename', username);
+
+			if (DefaultCapabilities.length > 0) this.send('cap', ...DefaultCapabilities);
+
+			this.send('connect', id);
+			this.node = id;
+		});
+	}
+
+	close() {
+		this.connectedToVM = false;
+
+		for (let cb of this.unsubscribeCallbacks) {
+			cb();
+		}
+		this.unsubscribeCallbacks = [];
+
+		if (this.socket.readyState === WebSocket.OPEN) this.socket.close();
+	}
+
+	getUsers(): User[] {
+		return [...this.users.values()];
+	}
+
+	private onInternal<E extends keyof CollabVMClientPrivateEvents>(event: E, callback: CollabVMClientPrivateEvents[E]): Unsubscribe {
+		return this.internalEmitter.on(event, callback);
 	}
 }
