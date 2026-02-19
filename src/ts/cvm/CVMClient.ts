@@ -358,7 +358,33 @@ export default class CVMClient {
 				});
 			}
 			case 'vote': {
+				switch (msgArr[1]) {
+					case '0':
+						//! Vote started
+					case '1':
+						let timeToEnd = Number(msgArr[2]);
+						let yesVotes = Number(msgArr[3]);
+						let noVotes = Number(msgArr[4]);
 
+						if (Number.isNaN(timeToEnd) || Number.isNaN(yesVotes) || Number.isNaN(noVotes)) return;
+
+						this.voteStatus = {
+							timeToEnd: timeToEnd,
+							yesVotes: yesVotes,
+							noVotes: noVotes
+						};
+
+						this.publicEmitter.emit('vote', this.voteStatus);
+						break;
+					case '2':
+						this.voteStatus = null;
+
+						this.publicEmitter.emit('voteend');
+						break;
+					case '3':
+						this.publicEmitter.emit('votecd', Number(msgArr[3]));
+				}
+				break;
 			}
 			// case 'auth': {
 
@@ -367,7 +393,34 @@ export default class CVMClient {
 
 			// }
 			case 'admin': {
-
+				switch (msgArr[1]) {
+					case '0': {
+						switch (msgArr[2]) {
+							case '0':
+								this.publicEmitter.emit('badpw');
+								return;
+							case '1':
+								this.perms.set(65535);
+								this.rank = Rank.Admin;
+								break;
+							case '3':
+								this.perms.set(Number(msgArr[3]));
+								this.rank = Rank.Moderator;
+								break;
+						}
+						this.publicEmitter.emit('login', this.rank, this.perms);
+						break;
+					}
+					case '19': {
+						this.internalEmitter.emit('ip', msgArr[2]!, msgArr[3]!);
+						break;
+					}
+					case '2': {
+						this.internalEmitter.emit('qemu', msgArr[2]!);
+						break;
+					}
+				}
+				break;
 			}
 			// case 'flag': {
 			// 	for (let i = 1; i + 1 < msgArr.length; i += 2) {
