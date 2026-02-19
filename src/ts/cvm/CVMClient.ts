@@ -440,4 +440,17 @@ export default class CVMClient {
 			// }
 		}
 	}
+
+	private loadRectangle(img: HTMLImageElement, x: number, y: number) {
+		if (this.actualScreenSize.width !== this.canvasScale.width || this.actualScreenSize.height !== this.canvasScale.height)
+			this.unscaledCtx.drawImage(img, x, y);
+
+		this.ctx.drawImage(img, 0, 0, img.width, img.height,
+			(x / this.actualScreenSize.width) * this.canvas.width,
+			(y / this.actualScreenSize.height) * this.canvas.height,
+			(img.width / this.actualScreenSize.width) * this.canvas.width,
+			(img.height / this.actualScreenSize.height) * this.canvas.height
+		);
+
+	}
 }
