@@ -118,6 +118,8 @@ async function multicollab(url: string) {
 		wrapper.appendChild(card);
 
 		cards.push(wrapper);
+
+		sortVMList();
 	}
 }
 
@@ -143,6 +145,15 @@ async function loadList() {
 	} catch (e) {
 		alert((e as Error).message);
 	}
+}
+
+function sortVMList() {
+	cards.sort((a, b) => {
+		return a.children[0].getAttribute('data-cvm-node')! > b.children[0].getAttribute('data-cvm-node')! ? 1 : -1;
+	});
+
+	elements.vmlist.children[0].innerHTML = '';
+	cards.forEach((c) => elements.vmlist.children[0].appendChild(c));
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
