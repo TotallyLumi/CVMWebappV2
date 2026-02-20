@@ -124,7 +124,29 @@ async function multicollab(url: string) {
 }
 
 async function openVM(vm: VM): Promise<void> {
+	if (VM !== null) return;
 
+	expectedClose = false;
+	location.hash = vm.id;
+
+	VM = new CVMClient(vm.url);
+
+	await VM!.WaitForOpen();
+
+	let username = localStorage.getItem('username');
+	let connected = await VM.connect(vm.id, username);
+
+	if (!connected) {
+		closeVM();
+		throw new Error('Failed to connect to node');
+	}
+
+	document.title = "CollabVM";
+
+	elements.vmdisplay.appendChild(VM!.canvas);
+	elements.vmlist.style.display = 'none';
+	elements.vmview.style.display = 'block';
+	return;
 }
 
 function closeVM() {

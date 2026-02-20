@@ -517,7 +517,7 @@ export default class CVMClient {
 
 				for (let i = 0; i < list.length; i += 3) {
 					let th = new Image();
-					th.src = 'data:image/jpeg;base64', + list[i + 2];
+					th.src = 'data:image/jpeg;base64,' + list[i + 2];
 					vms.push({
 						url: this.url,
 						id: list[i],
