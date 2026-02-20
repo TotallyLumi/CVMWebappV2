@@ -115,7 +115,7 @@ export default class CVMClient {
 		this.socket.binaryType = "arraybuffer";
 
 		this.socket.addEventListener("open", () => this.onOpen());
-		this.socket.addEventListener("message", () => this.onMessage(event));
+		this.socket.addEventListener("message", (event) => this.onMessage(event));
 		this.socket.addEventListener("close", () => this.publicEmitter.emit("close"));
 	}
 
@@ -442,15 +442,23 @@ export default class CVMClient {
 		}
 	}
 
-	private loadRectangle(img: HTMLImageElement, x: number, y: number) {
+	private getSourceSize(source: CanvasImageSource) {
+		return source instanceof HTMLImageElement
+			? { width: source.naturalWidth, height: source.naturalHeight }
+			: { width: (source as ImageBitmap | HTMLCanvasElement).width, height: (source as ImageBitmap | HTMLCanvasElement).height };
+	}
+
+	private loadRectangle(img: CanvasImageSource, x: number, y: number) {
+		const { width, height } = this.getSourceSize(img);
+
 		if (this.actualScreenSize.width !== this.canvasScale.width || this.actualScreenSize.height !== this.canvasScale.height)
 			this.unscaledCtx.drawImage(img, x, y);
 
-		this.ctx.drawImage(img, 0, 0, img.width, img.height,
+		this.ctx.drawImage(img, 0, 0, width, height,
 			(x / this.actualScreenSize.width) * this.canvas.width,
 			(y / this.actualScreenSize.height) * this.canvas.height,
-			(img.width / this.actualScreenSize.width) * this.canvas.width,
-			(img.height / this.actualScreenSize.height) * this.canvas.height
+			(width / this.actualScreenSize.width) * this.canvas.width,
+			(height / this.actualScreenSize.height) * this.canvas.height
 		);
 	}
 

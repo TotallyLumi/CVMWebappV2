@@ -13,7 +13,8 @@
         "wss://computernewb.com/collab-vm/vm5",
         "wss://computernewb.com/collab-vm/vm6",
         "wss://computernewb.com/collab-vm/vm7",
-        "wss://computernewb.com/collab-vm/vm8"
+        "wss://computernewb.com/collab-vm/vm8",
+        "wss://vps1vm8.shijimanet.com/vm10"
     ],
     "ServerAddressesListURI": null,
     "NSFWVMs": ["vm0b0t"],

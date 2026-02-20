@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "CollabVM Webapp created in TailWindCSS",
   "author": "totallylumi",
-  "type": "module",
   "scripts": {
+    "build": "parcel build --no-source-maps --dist-dir dist --public-url '.' src/html/index.html",
     "build:css": "tailwindcss -i ./src/css/input.css -o ./src/css/style.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,8 @@
     "@tailwindcss/forms": "^0.5.11",
     "@types/dompurify": "^3.0.5",
     "autoprefixer": "^10.4.24",
+    "parcel": "^2.16.4",
+    "parcel-reporter-static-files-copy": "^1.5.3",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3"

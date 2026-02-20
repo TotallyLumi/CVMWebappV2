@@ -7,7 +7,7 @@ import type VM from "./cvm/VM.js";
 import type TurnStatus from "./cvm/TurnStatus.js";
 import type VoteStatus from "./cvm/VoteStatus.js";
 
-import Config from '../../config.json' with { type: 'json' };
+import Config from '../../config.json';
 
 import dayjs from 'dayjs';
 import DOMPurify from 'dompurify';
