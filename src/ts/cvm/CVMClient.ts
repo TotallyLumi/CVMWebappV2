@@ -106,11 +106,15 @@ export default class CVMClient {
 		this.unscaledCanvas = document.createElement("canvas");
 
 		this.ctx = this.canvas.getContext("2d")!;
-		this.unscaledCtx = this.canvas.getContext("2d")!;
+		this.unscaledCtx = this.unscaledCanvas.getContext("2d")!;
 
 		//* Canvas stuff
 
 		//* Websocket stuff
+		window.addEventListener('resize', (e) => this.onWindowResize(e));
+
+		this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
 		this.socket = new WebSocket(url, "guacamole");
 		this.socket.binaryType = "arraybuffer";
 
@@ -144,7 +148,7 @@ export default class CVMClient {
 				const blob = new Blob([buffer], { type: "image/jpeg" });
 
 				createImageBitmap(blob).then((bitmap) => {
-					this.ctx.drawImage(bitmap, 0, 0);
+					this.loadRectangle(bitmap, msg.rect!.x, msg.rect!.y);
 				});
 				break;
 			}
@@ -442,24 +446,15 @@ export default class CVMClient {
 		}
 	}
 
-	private getSourceSize(source: CanvasImageSource) {
-		return source instanceof HTMLImageElement
-			? { width: source.naturalWidth, height: source.naturalHeight }
-			: { width: (source as ImageBitmap | HTMLCanvasElement).width, height: (source as ImageBitmap | HTMLCanvasElement).height };
-	}
+	private loadRectangle(img: ImageBitmap, x: number, y: number) {
+		const dx = Math.round((x / this.actualScreenSize.width) * this.canvas.width);
+		const dy = Math.round((y / this.actualScreenSize.height) * this.canvas.height);
+		const dw = Math.round((img.width / this.actualScreenSize.width) * this.canvas.width);
+		const dh = Math.round((img.height / this.actualScreenSize.height) * this.canvas.height);
 
-	private loadRectangle(img: CanvasImageSource, x: number, y: number) {
-		const { width, height } = this.getSourceSize(img);
+		this.ctx.clearRect(dx, dy, dw, dh);
 
-		if (this.actualScreenSize.width !== this.canvasScale.width || this.actualScreenSize.height !== this.canvasScale.height)
-			this.unscaledCtx.drawImage(img, x, y);
-
-		this.ctx.drawImage(img, 0, 0, width, height,
-			(x / this.actualScreenSize.width) * this.canvas.width,
-			(y / this.actualScreenSize.height) * this.canvas.height,
-			(width / this.actualScreenSize.width) * this.canvas.width,
-			(height / this.actualScreenSize.height) * this.canvas.height
-		);
+		this.ctx.drawImage(img, 0, 0, img.width, img.height, dx, dy, dw, dh);
 	}
 
 	private onWindowResize(e: Event) {

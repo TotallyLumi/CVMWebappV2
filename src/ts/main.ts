@@ -9,6 +9,9 @@ import type VoteStatus from "./cvm/VoteStatus.js";
 
 import Config from '../../config.json';
 
+import "../css/style.css";
+import "../css/frontend.css";
+
 import dayjs from 'dayjs';
 import DOMPurify from 'dompurify';
 
@@ -21,6 +24,7 @@ const elements = {
 	vmlist: document.getElementById('vmList') as HTMLDivElement,
 	vmview: document.getElementById('vmView') as HTMLDivElement,
 	vmdisplay: document.getElementById('vmDisplay') as HTMLDivElement,
+	vmname: document.getElementById('vmName') as HTMLHeadingElement,
 };
 
 let expectedClose = false;
@@ -46,6 +50,115 @@ const users: {
 
 let VM: CVMClient | null = null;
 
+type ModalType = "info" | "warning" | "error" | "success";
+
+interface ModalOptions {
+    title?: string;
+    message: string;
+    type?: ModalType;
+    confirmText?: string;
+    dismissible?: boolean;
+    onConfirm?: () => void;
+}
+
+function showSiteModal(options: ModalOptions) {
+    const container = document.getElementById("siteModalContainer");
+    if (!container) return;
+
+    const {
+        title = "Notice",
+        message,
+        type = "info",
+        confirmText = "OK",
+        dismissible = true,
+        onConfirm
+    } = options;
+
+    const colors = {
+        info: "bg-blue-600",
+        warning: "bg-yellow-500",
+        error: "bg-red-600",
+        success: "bg-green-600"
+    };
+
+    document.body.style.overflow = "hidden";
+
+    const overlay = document.createElement("div");
+    overlay.className = `
+        fixed inset-0 z-50
+        bg-black/70 backdrop-blur-sm
+        flex items-center justify-center
+        px-4
+    `;
+
+    const modal = document.createElement("div");
+    modal.className = `
+        w-full max-w-md
+        bg-zinc-900 border border-zinc-800
+        rounded-2xl shadow-2xl
+        overflow-hidden
+        animate-fade-in
+    `;
+
+    modal.innerHTML = `
+        <div class="${colors[type]} px-6 py-4 text-white font-semibold">
+            ${title}
+        </div>
+        <div class="p-6 text-sm text-zinc-300">
+            ${message}
+        </div>
+        <div class="px-6 py-4 flex justify-end gap-3 border-t border-zinc-800">
+            ${dismissible ? `<button id="modalCancel" class="px-4 py-2 bg-zinc-700 rounded-lg hover:bg-zinc-600 transition">Cancel</button>` : ""}
+            <button id="modalConfirm" class="px-4 py-2 btn-primary">
+                ${confirmText}
+            </button>
+        </div>
+    `;
+
+    overlay.appendChild(modal);
+    container.appendChild(overlay);
+
+    function close() {
+        document.body.style.overflow = "";
+        overlay.remove();
+    }
+
+    if (dismissible) {
+        modal.querySelector("#modalCancel")?.addEventListener("click", close);
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) close();
+        });
+    }
+
+    modal.querySelector("#modalConfirm")?.addEventListener("click", () => {
+        onConfirm?.();
+        close();
+    });
+}
+
+
+function handleConfigSiteAlert() {
+    const alertConfig = Config.SiteAlert;
+    if (!alertConfig) return;
+
+    if (alertConfig.showOnce) {
+        const dismissed = localStorage.getItem("siteAlertDismissed");
+        if (dismissed === "true") return;
+    }
+
+    showSiteModal({
+        title: alertConfig.title ?? "Notice",
+        message: DOMPurify.sanitize(alertConfig.message),
+        type: alertConfig.type as ModalType ?? "info",
+        dismissible: alertConfig.dismissible ?? true,
+        onConfirm: () => {
+            if (alertConfig.showOnce) {
+                localStorage.setItem("siteAlertDismissed", "true");
+            }
+        }
+    });
+}
+
 async function multicollab(url: string) {
 	let client = new CVMClient(url);
 	await client.WaitForOpen();
@@ -64,7 +177,21 @@ async function multicollab(url: string) {
 
 		let card = document.createElement('div');
 
-		card.classList.add('group', 'relative', 'bg-white', 'dark:bg-zinc-900', 'rounded-xl', 'overflow-hidden', 'shadow-md', 'transition-all', 'duration-300', 'ease-out', 'hover:-translate-y-2', 'hover:shadow-2xl', 'cursor-pointer');
+		card.classList.add(
+			'group',
+			'relative',
+			'bg-white',
+			'dark:bg-zinc-900',
+			'rounded-xl',
+			'shadow-sm',
+			'transition-all',
+			'duration-300',
+			'ease-out',
+			'hover:-translate-y-2',
+			'cursor-pointer',
+			'transition-shadow',
+			'hover:shadow-[0_0_25px_rgba(59,130,246,0.7)]'
+		);
 
 		if (Config.NSFWVMs.indexOf(vm.id) !== -1) {
 			card.classList.add('ring-2', 'ring-pink-500/60');
@@ -143,6 +270,7 @@ async function openVM(vm: VM): Promise<void> {
 
 	document.title = "CollabVM";
 
+	elements.vmname.innerHTML = `${vm.displayName} | VIRTUAL MACHINE`;
 	elements.vmdisplay.appendChild(VM!.canvas);
 	elements.vmlist.style.display = 'none';
 	elements.vmview.style.display = 'block';
@@ -180,4 +308,8 @@ function sortVMList() {
 
 document.addEventListener('DOMContentLoaded', async () => {
 	loadList();
+
+	if (Config.SiteAlert?.enabled) {
+		handleConfigSiteAlert();
+	}
 });

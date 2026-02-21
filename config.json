@@ -1,5 +1,13 @@
 {
     "SiteNameOverride": null,
+    "SiteAlert": {
+        "enabled": true,
+        "title": "Scheduled Maintenance",
+        "message": "This VM will restart tonight at 2AM.",
+        "type": "warning",
+        "dismissible": true,
+        "showOnce": true
+    },
     "WelcomeModalTitleOverride": null,
     "WelcomeModalBodyOverride": null,
     "WelcomeModalLocalStorageKey": "no-welcome-modal",
