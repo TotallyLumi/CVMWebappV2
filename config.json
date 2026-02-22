@@ -13,16 +13,11 @@
     "WelcomeModalLocalStorageKey": "no-welcome-modal",
     "ChatSound": "//computernewb.com/collab-vm/notify.ogg",
     "ServerAddresses": [
-        "wss://computernewb.com/collab-vm/vm0",
-        "wss://computernewb.com/collab-vm/vm1",
-        "wss://computernewb.com/collab-vm/vm2",
-        "wss://computernewb.com/collab-vm/vm3",
-        "wss://computernewb.com/collab-vm/vm4",
-        "wss://computernewb.com/collab-vm/vm5",
-        "wss://computernewb.com/collab-vm/vm6",
-        "wss://computernewb.com/collab-vm/vm7",
-        "wss://computernewb.com/collab-vm/vm8",
-        "wss://vps1vm8.shijimanet.com/vm10"
+        "ws://127.0.0.1:6004",
+        "wss://vps1vm8.shijimanet.com/vm10",
+        "wss://vps1vm8.shijimanet.com/vm12",
+        "wss://vps1vm8.shijimanet.com/vm13",
+        "wss://vps1.shijimanet.com/"
     ],
     "ServerAddressesListURI": null,
     "NSFWVMs": ["vm11"],

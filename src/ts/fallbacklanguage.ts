@@ -42,6 +42,11 @@ const fallbackLanguage: Language = {
 		"kError_UsernameInvalid": "Usernames can contain only numbers, letters, spaces, dashes, underscores, and dots, and it must be between 3 and 20 characters.",
 		"kError_UsernameBlacklisted": "That username has been blacklisted.",
 		"kError_IncorrectPassword": "Incorrect password.",
+
+		// Prompt thingys
+		"kVMPrompts_AdminChangeUsernamePrompt": "Enter new username for {0}:",
+		"kVMPrompts_AdminRestoreVMPrompt": "Are you sure you want to restore the VM?",
+		"kVMPrompts_EnterNewUsernamePrompt": "Enter a new username, or leave the field blank to be assigned a guest username",
 	}
 }
 

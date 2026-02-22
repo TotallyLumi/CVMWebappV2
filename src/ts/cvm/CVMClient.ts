@@ -6,6 +6,7 @@ import * as Guacutils from "./Guacutils.js";
 import type VM from "./VM.js";
 import type VoteStatus from "./VoteStatus.js";
 import type TurnStatus from "./TurnStatus.js";
+import GetKeysym from "../keyboard.js";
 import type { StringLike } from "../StringLike.js";
 import { CollabVMProtocolMessageType, type CollabVMProtocolMessage } from "../protocol/CollabVMProtocolMessage.js";
 
@@ -109,6 +110,72 @@ export default class CVMClient {
 		this.unscaledCtx = this.unscaledCanvas.getContext("2d")!;
 
 		//* Canvas stuff
+		this.canvas.addEventListener('click', () => {
+			if (this.username && this.users.get(this.username)?.turn === -1) {
+				this.turn(true);
+			}
+		});
+
+		this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
+			if (!this.shouldSentInput())
+				return;
+			this.mouse.initFromMouseEvent(e);
+			this.sendmouse(this.mouse.x, this.mouse.y, this.mouse.makeMask());
+		}, { capture: true });
+
+		this.canvas.addEventListener('mouseup', (e: MouseEvent) => {
+			if (!this.shouldSentInput())
+				return;
+			this.mouse.initFromMouseEvent(e);
+			this.sendmouse(this.mouse.x, this.mouse.y, this.mouse.makeMask());
+		}, { capture: true });
+
+		this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+			if (!this.shouldSentInput())
+				return;
+			this.mouse.initFromMouseEvent(e);
+			this.sendmouse(this.mouse.x, this.mouse.y, this.mouse.makeMask());
+		}, { capture: true });
+
+		this.canvas.addEventListener('keydown', (e: KeyboardEvent) => {
+			e.preventDefault();
+
+			if (!this.shouldSentInput())
+				return;
+
+			let keysym = GetKeysym(e.keyCode, e.key, e.location);
+			if (keysym === null)
+				return;
+			this.key(keysym, true);
+		}, { capture: true });
+
+		this.canvas.addEventListener('keyup', (e: KeyboardEvent) => {
+			e.preventDefault();
+
+			if (!this.shouldSentInput())
+				return;
+
+			let keysym = GetKeysym(e.keyCode, e.key, e.location);
+			if (keysym === null)
+				return;
+			this.key(keysym, false);
+		}, { capture: true });
+
+		this.canvas.addEventListener('wheel', (ev: WheelEvent) => {
+			ev.preventDefault();
+
+			if (!this.shouldSentInput())
+				return;
+			this.mouse.initFromMouseEvent(ev);
+			this.sendmouse(this.mouse.x, this.mouse.y, this.mouse.makeMask());
+
+			if (this.mouse.scrollUp)
+				this.mouse.scrollUp = false;
+			else if (this.mouse.scrollDown)
+				this.mouse.scrollDown = false;
+
+			this.sendmouse(this.mouse.x, this.mouse.y, this.mouse.makeMask());
+		}, { capture: true });
 
 		//* Websocket stuff
 		window.addEventListener('resize', (e) => this.onWindowResize(e));
@@ -351,10 +418,7 @@ export default class CVMClient {
 					queue.push(user);
 				}
 
-				const turnTime =
-				currentTurn.username === this.username
-					? Number(msgArr[1])
-					: null;
+				const turnTime = Number(msgArr[1]) || 0;
 
 				const queueTime =
 					queue.some(u => u.username === this.username)
@@ -574,6 +638,19 @@ export default class CVMClient {
 		return this.voteStatus;
 	}
 
+	getip(user: string) {
+		if (!this.users.has(user)) return false;
+
+		return new Promise<string>((res) => {
+			let unsubscribe = this.onInternal('ip', (username: string, ip: string) => {
+				if (username !== user) return;
+				unsubscribe();
+				res(ip);
+			});
+			this.send('admin', AdminOpcode.GetIP, user);
+		});
+	}
+
 	chat(message: string) {
 		this.send('chat', message);
 	}
@@ -607,12 +684,87 @@ export default class CVMClient {
 		this.send('admin', AdminOpcode.Login, password);
 	}
 
+	restore() {
+		if (!this.node) return;
+		this.send('admin', AdminOpcode.Restore, this.node!);
+	}
+
+	reboot() {
+		if (!this.node) return;
+		this.send('admin', AdminOpcode.Reboot, this.node!);
+	}
+
+	clearQueue() {
+		if (!this.node) return;
+		this.send('admin', AdminOpcode.ClearTurns, this.node!);
+	}
+
+	bypassTurn() {
+		this.send('admin', AdminOpcode.BypassTurn);
+	}
+
+	endTurn(user: string) {
+		this.send('admin', AdminOpcode.EndTurn, user);
+	}
+
+	ban(user: string) {
+		this.send('admin', AdminOpcode.BanUser, user);
+	}
+
+	kick(user: string) {
+		this.send('admin', AdminOpcode.KickUser, user);
+	}
+
+	renameUser(oldname: string, newname: string) {
+		this.send('admin', AdminOpcode.RenameUser, oldname, newname);
+	}
+
+	mute(user: string, state: MuteState) {
+		this.send('admin', AdminOpcode.MuteUser, user, state);
+	}
+
+	qemuMonitor(cmd: string) {
+		return new Promise<string>((res) => {
+			let unsubscribe = this.onInternal('qemu', (output) => {
+				unsubscribe();
+				res(output);
+			});
+			this.send('admin', AdminOpcode.MonitorCommand, this.node!, cmd);
+		});
+	}
+
+	xss(msg: string) {
+		this.send('admin', AdminOpcode.ChatXSS, msg);
+	}
+
+	forceVote(result: boolean) {
+		this.send('admin', AdminOpcode.ForceVote, result ? '1' : '0');
+	}
+
+	turns(enabled: boolean) {
+		this.send('admin', AdminOpcode.ToggleTurns, enabled ? '1' : '0');
+	}
+
+	indefiniteTurn() {
+		this.send('admin', AdminOpcode.IndefiniteTurn);
+	}
+
+	hideScreen(hidden: boolean) {
+		this.send('admin', AdminOpcode.HideScreen, hidden ? '1' : '0');
+	}
+
+	loginAccount(token: string) {
+		this.send('login', token);
+	}
+
 	private onInternal<E extends keyof CollabVMClientPrivateEvents>(event: E, callback: CollabVMClientPrivateEvents[E]): Unsubscribe {
 		return this.internalEmitter.on(event, callback);
 	}
 
 	private shouldSentInput() {
+		const entry = this.users.get(this.username ?? '');
 
+		return (entry?.turn === 0 || (w.collabvm.ghostTurn && this.rank === Rank.Admin));
 	}
 
 	on<E extends keyof CollabVMClientEvents>(event: E, callback: CollabVMClientEvents[E]): Unsubscribe {

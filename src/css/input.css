@@ -16,3 +16,13 @@
   @apply px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200
          text-sm font-medium rounded-lg border border-zinc-700 transition;
 }
+
+.btn-red {
+  @apply px-4 py-2 bg-red-600 hover:bg-red-500 text-white
+         text-sm font-medium rounded-lg transition;
+}
+
+.btn-green {
+  @apply px-4 py-2 bg-green-600 hover:bg-green-500 text-white
+         text-sm font-medium rounded-lg transition;
+}

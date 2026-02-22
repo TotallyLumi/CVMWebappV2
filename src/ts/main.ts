@@ -22,16 +22,21 @@ const _eval = window.eval;
 const w = window as any;
 const elements = {
 	//TODO Add all of the web elements of the index page into here.
+	//* Site buttons
+	homeBtn: document.getElementById('homeBtn') as HTMLAnchorElement,
+
 	//* VM stuff
 	vmList: document.getElementById('vmList') as HTMLDivElement,
 	vmView: document.getElementById('vmView') as HTMLDivElement,
 	vmDisplay: document.getElementById('vmDisplay') as HTMLDivElement,
 	vmName: document.getElementById('vmName') as HTMLHeadingElement,
 	username: document.getElementById('username') as HTMLSpanElement,
+	chatInput: document.getElementById('chatInput') as HTMLInputElement,
 	chatList: document.getElementById('chatList') as HTMLTableSectionElement,
 	chatListDiv: document.getElementById('chatListDiv') as HTMLDivElement,
 	userList: document.getElementById('userList') as HTMLDivElement,
 	onlineUserCount: document.getElementById('onlineUserCount') as HTMLSpanElement,
+	turnStatus: document.getElementById('turnStatus') as HTMLParagraphElement,
 
 	//* VM buttons
 	sendChatBtn: document.getElementById('sendChatBtn') as HTMLButtonElement,
@@ -40,6 +45,10 @@ const elements = {
 	screenshotBtn: document.getElementById('screenshotBtn') as HTMLButtonElement,
 	voteResetButton: document.getElementById('voteResetButton') as HTMLButtonElement,
 	turnBtnText: document.getElementById('turnBtnText') as HTMLSpanElement,
+
+	//* VM admin
+	xssCheckboxContainer: document.getElementById('xssCheckboxContainer') as HTMLDivElement,
+	xssCheckbox: document.getElementById('xssCheckbox') as HTMLInputElement,
 };
 
 interface UserEntry {
@@ -52,8 +61,8 @@ interface UserEntry {
 let expectedClose = false;
 let turn = -1;
 
-let turnInterval: number | undefined = undefined;
-let voteInterval: number | undefined = undefined;
+let turnInterval: number | null = null;
+let voteInterval: number | null = null;
 
 let turnTimer = 0;
 let voteTimer = 0;
@@ -307,6 +316,8 @@ async function openVM(vm: VM): Promise<void> {
 	let username = localStorage.getItem('username');
 	let connected = await VM.connect(vm.id, username);
 
+	w.VMName = vm.id;
+
 	if (!connected) {
 		closeVM();
 		throw new Error('Failed to connect to node');
@@ -354,26 +365,90 @@ function sortUserList() {
 	const sortedUsers = Array.from(users.values());
 
 	sortedUsers.sort((a, b) => {
-		if (a.user.username === w.username) return -1;
-		if (b.user.username === w.username) return 1;
+		if (a.user.username === w.username && a.user.turn >= b.user.turn && b.user.turn !== 0)
+			return -1;
 
-		if (a.user.turn === -1) return 1;
-		if (b.user.turn === -1) return -1;
+		if (b.user.username === w.username && b.user.turn >= a.user.turn && a.user.turn !== 0)
+			return 1;
 
-		return a.user.turn - b.user.turn;
+		if (a.user.turn === b.user.turn)
+			return 0;
+
+		if (a.user.turn === -1)
+			return 1;
+
+		if (b.user.turn === -1)
+			return -1;
+
+		if (a.user.turn < b.user.turn)
+			return -1;
+		else
+			return 1;
 	});
 
-	const fragment = document.createDocumentFragment();
-
-	for (const entry of sortedUsers) {
-		fragment.appendChild(entry.element);
+	for (const user of users) {
+		elements.userList.removeChild(user[1].element);
+		elements.userList.appendChild(user[1].element);
 	}
-
-	elements.userList.appendChild(fragment);
 }
 
 function chatMessage(username: string, message: string) {
+    if (!Config.RawMessages.Messages) message = DOMPurify.sanitize(message);
 
+    const msgWrapper = document.createElement('div');
+    msgWrapper.className = 'flex items-start gap-2 py-1 px-2';
+
+    let msgClass = '';
+    let userClass = '';
+
+    if (username === '') {
+        msgWrapper.innerHTML = message;
+    } else {
+        const user = VM!.getUsers().find(u => u.username === username);
+        const rank = user ? user.rank : Rank.Unregistered;
+
+        switch (rank) {
+            case Rank.Unregistered:
+                userClass = 'chat-username-unregistered text-gray-500 font-medium';
+                msgClass = 'chat-unregistered text-gray-700';
+                break;
+            case Rank.Registered:
+                userClass = 'chat-username-registered text-green-600 font-medium';
+                msgClass = 'chat-registered text-gray-800';
+                break;
+            case Rank.Admin:
+                userClass = 'chat-username-admin text-red-600 font-semibold';
+                msgClass = 'chat-admin text-gray-800';
+                break;
+            case Rank.Moderator:
+                userClass = 'chat-username-moderator text-blue-600 font-semibold';
+                msgClass = 'chat-moderator text-gray-800';
+                break;
+        }
+
+        msgWrapper.className = msgClass;
+
+        const userSpan = document.createElement('span');
+        userSpan.className = userClass;
+        userSpan.textContent = `${username}▸`;
+
+        const msgSpan = document.createElement('span');
+        msgSpan.className = msgClass;
+        msgSpan.innerHTML = message;
+
+        msgWrapper.append(userSpan, msgSpan);
+    }
+
+    if (Config.RawMessages.Messages) {
+        Array.from(msgWrapper.children).forEach((child) => {
+            if (child.nodeName === 'SCRIPT') {
+                _eval((child as HTMLScriptElement).text);
+            }
+        });
+    }
+
+    elements.chatList.appendChild(msgWrapper);
+    elements.chatListDiv.scrollTop = elements.chatListDiv.scrollHeight;
 }
 
 function addUser(user: User) {
@@ -401,15 +476,19 @@ function addUser(user: User) {
 	switch (user.rank) {
 		case Rank.Admin:
 			usernameSpan.classList.add('text-red-600', 'font-semibold');
+			usernameSpan.innerHTML = `<i class='fa-solid fa-hammer'></i> ${user.username}`
 			break;
 		case Rank.Moderator:
 			usernameSpan.classList.add('text-blue-600', 'font-semibold');
+			usernameSpan.innerHTML = `<i class='fa-solid fa-hammer'></i> ${user.username}`
 			break;
 		case Rank.Registered:
 			usernameSpan.classList.add('text-green-600');
+			usernameSpan.innerHTML = `<i class='fa-solid fa-user'></i> ${user.username}`
 			break;
 		case Rank.Unregistered:
 			usernameSpan.classList.add('text-gray-500');
+			usernameSpan.innerHTML = `<i class='fa-solid fa-user'></i> ${user.username}`
 			break;
 	}
 
@@ -435,7 +514,14 @@ function addUser(user: User) {
 }
 
 function remUser(user: User) {
+	const entry = users.get(user.username);
+	if (!entry) return;
 
+	elements.userList.removeChild(entry.element);
+
+	users.delete(user.username);
+
+	elements.onlineUserCount.textContent = users.size.toString();
 }
 
 function getFlagEmoji(countryCode: string) {
@@ -464,7 +550,62 @@ function userRenamed(oldname: string, newname: string, selfrename: boolean) {
 }
 
 function turnUpdate(status: TurnStatus) {
-	sortUserList();
+    turn = -1;
+    turnTimer = 0;
+
+    VM!.canvas.classList.remove('focused', 'waiting');
+
+    if (turnInterval !== null) {
+        clearInterval(turnInterval);
+        turnInterval = null;
+    }
+
+    for (const entry of users.values()) {
+        entry.element.classList.remove('user-turn', 'user-waiting');
+        entry.element.setAttribute('data-cvm-turn', '-1');
+    }
+
+    if (!status.user) {
+        elements.turnStatus.innerText = '';
+        sortUserList();
+        return;
+    }
+
+    const currentEntry = users.get(status.user.username);
+    if (currentEntry) {
+        currentEntry.element.classList.add('user-turn');
+        currentEntry.element.setAttribute('data-cvm-turn', '0');
+    }
+
+    status.queue.forEach((u, i) => {
+        const entry = users.get(u.username);
+        if (!entry) return;
+        entry.element.classList.add('user-waiting');
+        entry.element.setAttribute('data-cvm-turn', i.toString());
+    });
+
+    if (status.user.username === w.username) {
+        turn = 0;
+        turnTimer = (status.turnTime ?? 0) / 1000;
+        elements.turnBtnText.innerHTML = TheI18n.getString(I18nStringKey.kVMButtons_EndTurn);
+        VM!.canvas.classList.add('focused');
+    } else if (status.queue.some(u => u.username === w.username)) {
+        turn = status.queue.findIndex(u => u.username === w.username) + 1;
+        turnTimer = (status.queueTime ?? 0) / 1000;
+        elements.turnBtnText.innerHTML = TheI18n.getString(I18nStringKey.kVMButtons_EndTurn);
+        VM!.canvas.classList.add('waiting');
+    } else {
+        turnTimer = (status.turnTime ?? 0) / 1000;
+    }
+
+    if (turnTimer > 0) {
+        turnInterval = window.setInterval(turnIntervalCb, 1000);
+        setTurnStatus();
+    } else {
+        elements.turnStatus.innerText = '';
+    }
+
+    sortUserList();
 }
 
 function voteUpdate(status: VoteStatus) {
@@ -479,15 +620,56 @@ function voteEnd() {
 
 }
 
-function turnInternvalCb() {
-
+function turnIntervalCb() {
+    if (turnTimer > 0) {
+        turnTimer--;
+        setTurnStatus();
+    } else {
+        clearInterval(turnInterval!);
+        turnInterval = null;
+        elements.turnStatus.innerText = '';
+    }
 }
 
 function setTurnStatus() {
+    if (!elements.turnStatus) return;
 
+    let i18nKey: I18nStringKey;
+    if (turn === 0) {
+        i18nKey = I18nStringKey.kVM_TurnTimeTimer;
+    } else if (turn > 0) {
+        i18nKey = I18nStringKey.kVM_WaitingTurnTimer;
+    } else {
+        // Spectator or no turn
+        i18nKey = I18nStringKey.kVM_TurnTimeTimer;
+    }
+
+    const seconds = Math.max(0, Math.floor(turnTimer));
+
+    let formatted = '';
+    try {
+        formatted = TheI18n.getString(i18nKey, seconds);
+    } catch (err) {
+        console.warn('Error formatting i18n string for turn timer:', err);
+
+        if (turn === 0)
+			formatted = `Your turn: ${seconds}s`;
+        else if (turn > 0)
+			formatted = `Waiting: ${seconds}s`;
+        else formatted = `Turn timer: ${seconds}s`;
+    }
+
+    elements.turnStatus.innerText = formatted;
 }
 
 function sendChat() {
+	if (VM === null)
+		return;
+	if (elements.xssCheckbox.checked)
+		VM.xss(elements.chatInput.value);
+	else
+		VM.chat(elements.chatInput.value);
+	elements.chatInput.value = '';
 
 }
 
@@ -498,6 +680,48 @@ function onLogin(_rank: Rank, _perms: Permissions) {
 function userModOptions(user: { user: User; element: HTMLDivElement } ) {
 
 }
+
+elements.homeBtn.addEventListener('click', () => closeVM());
+elements.sendChatBtn.addEventListener('click', sendChat);
+elements.chatInput.addEventListener('keypress', (e) => {
+	if (e.key === 'Enter')
+		sendChat();
+});
+elements.changeUsernameBtn.addEventListener('click', () => {
+	let oldname = w.username.nodeName === undefined ? w.username : w.username.innerText;
+	let newname = prompt(TheI18n.getString(I18nStringKey.kVMPrompts_EnterNewUsernamePrompt), oldname);
+
+	if (newname === oldname)
+		return;
+	VM?.rename(newname);
+});
+elements.takeTurnBtn.addEventListener('click', () => {
+	VM?.turn(turn === -1);
+});
+elements.screenshotBtn.addEventListener('click', () => {
+	if (!VM) return;
+
+	VM.canvas.toBlob((blob) => {
+		open(URL.createObjectURL(blob!), '_blank');
+	});
+});
+
+// API
+w.collabvm = {
+	openVM: openVM,
+	closeVM: closeVM,
+	loadList: loadList,
+	multicollab: multicollab,
+	getVM: () => VM
+};
+w.multicollab = multicollab;
+w.GetAdmin = () => {
+
+};
+w.cvmEvents + {
+
+};
+w.VMName = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
 	loadList();
@@ -513,11 +737,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 			document.title = Format('{0} - {1}', VM.getNode()!, TheI18n.getString(I18nStringKey.kGeneric_CollabVM));
 
 			if (turn !== -1) {
-
+				if (turn === 0)
+					elements.turnStatus.innerText = TheI18n.getString(I18nStringKey.kVM_TurnTimeTimer, turnTimer);
+				else
+					elements.turnStatus.innerText = TheI18n.getString(I18nStringKey.kVM_WaitingTurnTimer, turnTimer);
+				elements.turnBtnText.innerText = TheI18n.getString(I18nStringKey.kVMButtons_EndTurn);
 			}
-			else {
+			else
 				elements.turnBtnText.innerText = TheI18n.getString(I18nStringKey.kVMButtons_TakeTurn);
-			}
+			if (VM!.getVoteStatus())
+				console.log("VOTE STARTED");
 		}
 		else {
 			document.title = TheI18n.getString(I18nStringKey.kGeneric_CollabVM);

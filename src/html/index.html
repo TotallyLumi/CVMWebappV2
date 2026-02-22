@@ -23,6 +23,7 @@
 				</a>
 
 				<li class="relative list-none group">
+					<a href="#" class="flex items-center gap-1 px-3 py-2 text-zinc-100 hover:text-zinc-400 transition">
 						<i class="fa-solid fa-globe"></i>
 						<span id="languageDropdownText"></span>
 						<svg class="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,11 +58,21 @@
 						<h2 id="vmName" class="font-semibold text-sm text-zinc-400 uppercase tracking-wider">
 							Virtual Machine
 						</h2>
-						<span id="turnstatus" class="text-sm text-zinc-400"></span>
 					</div>
 
-					<div id="vmDisplay" class="bg-black rounded-b-2xl overflow-hidden"></div>
+					<div id="vmDisplay" class="relative bg-black rounded-b-2xl overflow-hidden flex justify-center">
+						<p id="turnStatus" class="absolute top-3 left-1/2 -translate-x-1/2 bg-zinc-900/80 backdrop-blur-sm px-4 py-1 rounded-lg text-sm text-zinc-300 shadow-md"></p>
+					</div>
+				</section>
 
+				<br>
+
+				<section class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-sm">
+					<div class="p-4 border-b border-zinc-800 flex items-center justify-between">
+						<h2 id="vmControls" class="font-semibold text-sm text-zinc-400 uppercase tracking-wider">
+							VM Controls
+						</h2>
+					</div>
 					<div class="p-6 flex flex-wrap gap-3">
 						<button id="takeTurnBtn" class="btn-primary">
 							<i class="fa-solid fa-computer-mouse"></i>
@@ -71,7 +82,11 @@
 							<i class="fa-solid fa-keyboard"></i>
 							<span id="oskBtnText"></span>
 						</button>
-						<button id="voteResetBtn" class="btn-primary">
+						<button id="changeUsernameBtn" class="btn-primary">
+							<i class="fa-solid fa-signature"></i>
+							<span id="changeUsernameBtnText"></span>
+						</button>
+						<button id="voteResetBtn" class="btn-red">
 							<i class="fa-solid fa-rotate-left"></i>
 							<span id="voteForResetBtnText"></span>
 						</button>
@@ -82,25 +97,31 @@
 					</div>
 				</section>
 
-				<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-					<div class="bg-zinc-900 border border-zinc-800 rounded-2xl">
+				<br>
+
+				<section class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[500px]">
+					<div class="bg-zinc-900 border border-zinc-800 rounded-2xl flex flex-col min-h-0">
 						<div class="p-4 border-b border-zinc-800">
 							<h3 class="text-sm font-medium text-zinc-400">
 								<span id="usersOnlineText"></span>
 								(<span id="onlineUserCount"></span>)
 							</h3>
 						</div>
-						<div id="userList" class="p-4 space-y-2 text-sm max-h-[500px] overflow-y-auto"></div>
+						<div id="userList" class="flex-1 p-4 space-y-2 text-sm overflow-y-auto min-h-0"></div>
 					</div>
 
-					<div class="md:col-span-2 bg-zinc-900 border border-zinc-800 rounded-2xl flex flex-col">
+					<div class="md:col-span-2 bg-zinc-900 border border-zinc-800 rounded-2xl flex flex-col min-h-0">
 						<div id="chatListDiv" class="flex-1 p-4 space-y-3 overflow-y-auto text-sm"></div>
 						<div id="chatList"></div>
 
 						<div class="p-4 border-t border-zinc-800 flex gap-3">
 							<span id="username" class="px-3 py-2 bg-zinc-800 rounded-lg text-xs text-zinc-400"></span>
 							<input type="text" id="chatInput" placeholder="Message..." class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-							<button id="sendChatBtn" class="btn-primary">
+							<div class="" id="xssCheckboxContainer">
+								<input type="checkbox" value="" id="xssCheckbox">
+								<lable for="xssCheckbox">XSS</lable>
+							</div>
+							<button id="sendChatBtn" class="btn-green">
 								<i class="fa-solid fa-paper-plane"></i>
 							</button>
 						</div>

@@ -35,12 +35,17 @@ export enum I18nStringKey {
 	kVMButtons_VoteForReset = 'kVMButtons_VoteForReset',
 	kVMButtons_Screenshot = 'kVMButtons_Screenshot',
 
-	// error messages
+	// Error message thingys
 	kError_UnexpectedDisconnection = 'kError_UnexpectedDisconnection',
 	kError_UsernameTaken = 'kError_UsernameTaken',
 	kError_UsernameInvalid = 'kError_UsernameInvalid',
 	kError_UsernameBlacklisted = 'kError_UsernameBlacklisted',
 	kError_IncorrectPassword = 'kError_IncorrectPassword',
+
+	// Prompt thingys
+	kVMPrompts_AdminChangeUsernamePrompt = 'kVMPrompts_AdminChangeUsernamePrompt',
+	kVMPrompts_AdminRestoreVMPrompt = 'kVMPrompts_AdminRestoreVMPrompt',
+	kVMPrompts_EnterNewUsernamePrompt = 'kVMPrompts_EnterNewUsernamePrompt',
 }
 
 export interface I18nEvents {
@@ -215,7 +220,7 @@ export class I18n {
 			screenshotBtnText: I18nStringKey.kVMButtons_Screenshot,
 
 			// admin stuff
-			// badPasswordAlertText: I18nStringKey.kError_IncorrectPassword,
+			badPasswordAlertText: I18nStringKey.kError_IncorrectPassword,
 			// loginModalPasswordText: I18nStringKey.kGeneric_Password,
 			// loginButton: I18nStringKey.kGeneric_Login,
 			// passVoteBtnText: I18nStringKey.kAdminVMButtons_PassVote,

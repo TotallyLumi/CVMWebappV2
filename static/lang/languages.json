@@ -1,0 +1,9 @@
+{
+	"languages": {
+		"en-us": {
+			"languageName": "English (US)",
+			"flag": "🇺🇸"
+		}
+	},
+	"defaultLanguage": "en-us"
+}
