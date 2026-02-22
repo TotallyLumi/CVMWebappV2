@@ -25,7 +25,7 @@
         "wss://vps1vm8.shijimanet.com/vm10"
     ],
     "ServerAddressesListURI": null,
-    "NSFWVMs": ["vm0b0t"],
+    "NSFWVMs": ["vm11"],
     "RawMessages": {
         "VMTitles": true,
         "Messages": true

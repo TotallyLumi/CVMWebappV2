@@ -13,7 +13,7 @@
 	<body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
 		<nav class="glass sticky top-4 mx-6 px-6 py-3 flex justify-between items-center">
 			<span class="text-xl font-bold tracking-wider text-zinc-100">
-				<span id="siteNameText">CollabVM</span>
+				<span id="siteNameText"></span>
 			</span>
 
 			<div class="flex items-center gap-6 text-sm">
@@ -21,6 +21,21 @@
 					<i class="fa-solid fa-house mr-1"></i>
 					<span id="homeBtnText"></span>
 				</a>
+
+				<li class="relative list-none group">
+						<i class="fa-solid fa-globe"></i>
+						<span id="languageDropdownText"></span>
+						<svg class="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</a>
+					<div class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow-lg opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-200">
+						<div id="languageDropdown" class="py-1"></div>
+						<a href="https://github.com/computernewb/collab-vm-1.2-webapp/wiki/Contributing-a-Language" target="_blank" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+							<i class="fa-solid fa-plus"></i> Add Yours
+						</a>
+					</div>
+				</li>
 
 				<button id="toggleThemeBtn" class="btn-primary">
 					<i id="toggleThemeIcon" class="fa-solid fa-sun mr-1"></i>
@@ -49,16 +64,20 @@
 
 					<div class="p-6 flex flex-wrap gap-3">
 						<button id="takeTurnBtn" class="btn-primary">
+							<i class="fa-solid fa-computer-mouse"></i>
 							<span id="turnBtnText"></span>
 						</button>
 						<button id="oskBtn" class="btn-primary">
+							<i class="fa-solid fa-keyboard"></i>
 							<span id="oskBtnText"></span>
 						</button>
 						<button id="voteResetBtn" class="btn-primary">
-							<span id="voteResetText"></span>
+							<i class="fa-solid fa-rotate-left"></i>
+							<span id="voteForResetBtnText"></span>
 						</button>
 						<button id="screenshotBtn" class="btn-primary">
-							<span id="screenshotText"></span>
+							<i class="fa-solid fa-camera"></i>
+							<span id="screenshotBtnText"></span>
 						</button>
 					</div>
 				</section>
@@ -67,7 +86,7 @@
 					<div class="bg-zinc-900 border border-zinc-800 rounded-2xl">
 						<div class="p-4 border-b border-zinc-800">
 							<h3 class="text-sm font-medium text-zinc-400">
-								Users Online
+								<span id="usersOnlineText"></span>
 								(<span id="onlineUserCount"></span>)
 							</h3>
 						</div>

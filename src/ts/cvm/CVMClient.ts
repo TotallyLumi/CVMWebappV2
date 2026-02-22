@@ -237,12 +237,15 @@ export default class CVMClient {
 			}
 			case 'adduser': {
 				for (let i = 2; i + 1 < msgArr.length; i += 2) {
-					const username = msgArr[i];
+					let username = msgArr[i];
 					const rankString = msgArr[i + 1];
 
 					if (!username || !rankString) continue;
 
+					username = String(username).trim();
 					const rank = Number(rankString);
+
+					if (!username) continue;
 
 					let user = this.users.get(username);
 
@@ -254,6 +257,7 @@ export default class CVMClient {
 					}
 					this.publicEmitter.emit('adduser', user);
 				}
+				break;
 			}
 			case 'remuser': {
 				for (let i = 2; i < msgArr.length; i++) {
@@ -266,6 +270,7 @@ export default class CVMClient {
 					this.users.delete(username);
 					this.publicEmitter.emit('remuser', user);
 				}
+				break;
 			}
 			case 'rename': {
 				const mode = msgArr[1];
@@ -308,6 +313,7 @@ export default class CVMClient {
 				}
 
 				this.publicEmitter.emit('rename', oldUsername, newUsername, selfRename);
+				break;
 			}
 			case 'turn': {
 				for (const user of this.users.values()) {
@@ -361,6 +367,7 @@ export default class CVMClient {
 					turnTime,
 					queueTime
 				});
+				break;
 			}
 			case 'vote': {
 				switch (msgArr[1]) {
@@ -559,7 +566,60 @@ export default class CVMClient {
 		return [...this.users.values()];
 	}
 
+	getNode() {
+		return this.node;
+	}
+
+	getVoteStatus(): VoteStatus | null {
+		return this.voteStatus;
+	}
+
+	chat(message: string) {
+		this.send('chat', message);
+	}
+
+	rename(username: string | null = null) {
+		if (username)
+			this.send('rename', username);
+		else this.send('rename');
+	}
+
+	turn(taketurn: boolean) {
+		this.send('turn', taketurn ? '1' : '0');
+	}
+
+	sendmouse(_x: number, _y: number, mask: number) {
+		let x = Math.round((_x / this.canvas.width)  * this.actualScreenSize.width);
+		let y = Math.round((_y / this.canvas.height)  * this.actualScreenSize.height);
+
+		this.send('mouse', x, y, mask);
+	}
+
+	key(keysym: number, down: boolean) {
+		this.send('key', keysym, down ? '1' : '0');
+	}
+
+	vote(vote: boolean) {
+		this.send('vote', vote ? '1' : '0');
+	}
+
+	login(password: string) {
+		this.send('admin', AdminOpcode.Login, password);
+	}
+
 	private onInternal<E extends keyof CollabVMClientPrivateEvents>(event: E, callback: CollabVMClientPrivateEvents[E]): Unsubscribe {
 		return this.internalEmitter.on(event, callback);
+	}
+
+	private shouldSentInput() {
+
+	}
+
+	on<E extends keyof CollabVMClientEvents>(event: E, callback: CollabVMClientEvents[E]): Unsubscribe {
+		let unsub = this.publicEmitter.on(event, callback);
+
+		this.unsubscribeCallbacks.push(unsub);
+
+		return unsub;
 	}
 }
