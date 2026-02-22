@@ -11,6 +11,32 @@
 	</head>
 
 	<body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+		<!-- MODALS -->
+		<div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  			<div class="bg-zinc-900 rounded-lg shadow-lg w-full max-w-md mx-4 p-6 flex flex-col">
+    			<div class="flex justify-between items-center mb-4">
+      				<h5 class="text-lg font-semibold text-zinc-100">Login</h5>
+      				<button id="loginModalCloseBtn" class="text-zinc-400 hover:text-zinc-200 focus:outline-none" aria-label="Close">&times;</button>
+    			</div>
+
+    			<div class="mb-4">
+      				<div id="badPasswordAlert" class="bg-red-600 text-white p-2 rounded hidden flex justify-between items-center" role="alert">
+        			<span id="badPasswordAlertText"></span>
+        			<button id="incorrectPasswordDismissBtn" class="ml-2 text-white focus:outline-none" aria-label="Close">&times;</button>
+      			</div>
+
+      			<input type="hidden" name="username" id="adminInputVMID" />
+
+      			<label id="loginModalPasswordText" class="block text-zinc-300 mb-1">Password</label>
+      			<input id="adminPassword" type="password" class="w-full rounded border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" name="password" />
+    		</div>
+
+    		<div class="flex justify-end">
+      			<button id="loginButton" class="btn-primary px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold">Log in</button>
+    		</div>
+  		</div>
+		</div>
+
 		<nav class="glass sticky top-4 mx-6 px-6 py-3 flex justify-between items-center">
 			<span class="text-xl font-bold tracking-wider text-zinc-100">
 				<span id="siteNameText"></span>
@@ -60,9 +86,17 @@
 						</h2>
 					</div>
 
-					<div id="vmDisplay" class="relative bg-black rounded-b-2xl overflow-hidden flex justify-center">
+					<div id="vmDisplay" class="relative bg-black rounded-b-2xl flex justify-center">
 						<p id="turnStatus" class="absolute top-3 left-1/2 -translate-x-1/2 bg-zinc-900/80 backdrop-blur-sm px-4 py-1 rounded-lg text-sm text-zinc-300 shadow-md"></p>
 					</div>
+				</section>
+
+				<br>
+
+				<section id="voteResetPanel" style="display: none;" class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-sm">
+					<span id="voteResetHeaderText"></span><br>
+					<button class="btn btn-green" id="voteYesBtn"><i class="fa-solid fa-check"></i> <span id="voteYesBtnText"></span><span class="badge bg-secondary" id="voteYesLabel"></span></button>
+					<button class="btn btn-red" id="voteNoBtn"><i class="fa-solid fa-ban"></i> <span id="voteNoBtnText"></span><span class="badge bg-secondary" id="voteNoLabel"></span></button>
 				</section>
 
 				<br>
@@ -73,7 +107,7 @@
 							VM Controls
 						</h2>
 					</div>
-					<div class="p-6 flex flex-wrap gap-3">
+					<div class="p-6 flex flex-wrap gap-3 justify-center">
 						<button id="takeTurnBtn" class="btn-primary">
 							<i class="fa-solid fa-computer-mouse"></i>
 							<span id="turnBtnText"></span>
@@ -85,6 +119,10 @@
 						<button id="changeUsernameBtn" class="btn-primary">
 							<i class="fa-solid fa-signature"></i>
 							<span id="changeUsernameBtnText"></span>
+						</button>
+						<button id="ctrlAltDelBtn" class="btn-primary">
+							<i class="fa-solid fa-gear"></i>
+							<span id="ctrlAltDelBtnText"></span>
 						</button>
 						<button id="voteResetBtn" class="btn-red">
 							<i class="fa-solid fa-rotate-left"></i>

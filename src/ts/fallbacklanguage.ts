@@ -15,6 +15,8 @@ const fallbackLanguage: Language = {
 		"kGeneric_Cancel": 'Cancel',
 		"kGeneric_Send": 'Send',
 		"kGeneric_Understood": 'Understood',
+		"kGeneric_Password": "Password",
+		"kGeneric_Login": "Log in",
 
 		// Site thingys
 		"kSiteButtons_Home": 'Home',

@@ -49,6 +49,12 @@ const elements = {
 	//* VM admin
 	xssCheckboxContainer: document.getElementById('xssCheckboxContainer') as HTMLDivElement,
 	xssCheckbox: document.getElementById('xssCheckbox') as HTMLInputElement,
+	loginModal: document.getElementById('loginModal') as HTMLDivElement,
+	adminPassword: document.getElementById('adminPassword') as HTMLInputElement,
+	loginButton: document.getElementById('loginButton') as HTMLButtonElement,
+	adminInputVMID: document.getElementById('adminInputVMID') as HTMLInputElement,
+	badPasswordAlert: document.getElementById('badPasswordAlert') as HTMLDivElement,
+	incorrectPasswordDismissBtn: document.getElementById('incorrectPasswordDismissBtn') as HTMLButtonElement,
 };
 
 interface UserEntry {
@@ -59,6 +65,8 @@ interface UserEntry {
 }
 
 let expectedClose = false;
+let usernameClick = false;
+
 let turn = -1;
 
 let turnInterval: number | null = null;
@@ -311,10 +319,20 @@ async function openVM(vm: VM): Promise<void> {
 	VM!.on('votecd', (voteCooldown) => window.alert(TheI18n.getString(I18nStringKey.kVM_VoteCooldownTimer, voteCooldown)));
 	VM!.on('login', (rank: Rank, perms: Permissions) => onLogin(rank, perms));
 
+	VM!.on('close', () => {
+		if (!expectedClose)
+			alert(TheI18n.getString(I18nStringKey.kError_UnexpectedDisconnection));
+		closeVM();
+	});
+
 	await VM!.WaitForOpen();
+
+	chatMessage('', `<b>${vm.id}</b><hr>`);
 
 	let username = localStorage.getItem('username');
 	let connected = await VM.connect(vm.id, username);
+
+	elements.adminInputVMID.value = vm.id;
 
 	w.VMName = vm.id;
 
@@ -671,6 +689,60 @@ function sendChat() {
 		VM.chat(elements.chatInput.value);
 	elements.chatInput.value = '';
 
+}
+
+const loginModal = elements.loginModal as HTMLDivElement;
+const adminPassword = elements.adminPassword as HTMLInputElement;
+
+function showLoginModal() {
+	loginModal.classList.remove('hidden');
+	adminPassword.focus();
+}
+
+function hideLoginModal() {
+	loginModal.classList.add('hidden');
+}
+
+const closeBtns = [
+	document.getElementById('loginModalCloseBtn'),
+	document.getElementById('incorrectPasswordDismissBtn')
+];
+closeBtns.forEach(btn => {
+	btn?.addEventListener('click', hideLoginModal);
+});
+
+elements.username.addEventListener('click', () => {
+	if (!usernameClick) {
+		usernameClick = true;
+
+		setTimeout(() => (usernameClick = false), 1000);
+		return;
+	}
+	showLoginModal();
+});
+elements.loginButton.addEventListener('click', () => doLogin());
+elements.adminPassword.addEventListener('keypress', (e) => e.key === 'Enter' && doLogin());
+elements.incorrectPasswordDismissBtn.addEventListener('click', () => (elements.badPasswordAlert.style.display = 'none'));
+
+function doLogin() {
+	let adminPass = elements.adminPassword.value;
+
+	if (adminPass === '') return;
+
+	VM?.login(adminPass);
+
+	elements.adminPassword.value = '';
+
+	let u = VM?.on('login', () => {
+		u!();
+		loginModal.classList.add('hidden');
+		elements.badPasswordAlert.style.display = 'none';
+	});
+
+	let _u = VM?.on('badpw', () => {
+		_u!();
+		elements.badPasswordAlert.style.display = 'block';
+	});
 }
 
 function onLogin(_rank: Rank, _perms: Permissions) {

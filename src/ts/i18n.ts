@@ -14,6 +14,8 @@ export enum I18nStringKey {
 	kGeneric_Cancel = 'kGeneric_Cancel',
 	kGeneric_Send = 'kGeneric_Send',
 	kGeneric_Understood = 'kGeneric_Understood',
+	kGeneric_Password = 'kGeneric_Password',
+	kGeneric_Login = 'kGeneric_Login',
 
 	// Site thingys
 	kSiteButtons_Home = 'kSiteButtons_Home',
@@ -31,7 +33,7 @@ export enum I18nStringKey {
 	kVMButtons_EndTurn = 'kVMButtons_EndTurn',
 	kVMButtons_ChangeUsername = 'kVMButtons_ChangeUsername',
 	kVMButtons_Keyboard = 'kVMButtons_Keyboard',
-	kVMButtons_CtrlAltDel = 'KVMButtons_CtrlAltDel',
+	kVMButtons_CtrlAltDel = 'kVMButtons_CtrlAltDel',
 	kVMButtons_VoteForReset = 'kVMButtons_VoteForReset',
 	kVMButtons_Screenshot = 'kVMButtons_Screenshot',
 
@@ -213,6 +215,7 @@ export class I18n {
 			voteYesBtnText: I18nStringKey.kGeneric_Yes,
 			voteNoBtnText: I18nStringKey.kGeneric_No,
 
+			turnBtnText: I18nStringKey.kVMButtons_TakeTurn,
 			changeUsernameBtnText: I18nStringKey.kVMButtons_ChangeUsername,
 			oskBtnText: I18nStringKey.kVMButtons_Keyboard,
 			ctrlAltDelBtnText: I18nStringKey.kVMButtons_CtrlAltDel,
@@ -221,14 +224,14 @@ export class I18n {
 
 			// admin stuff
 			badPasswordAlertText: I18nStringKey.kError_IncorrectPassword,
-			// loginModalPasswordText: I18nStringKey.kGeneric_Password,
-			// loginButton: I18nStringKey.kGeneric_Login,
+			loginModalPasswordText: I18nStringKey.kGeneric_Password,
+			loginButton: I18nStringKey.kGeneric_Login,
 			// passVoteBtnText: I18nStringKey.kAdminVMButtons_PassVote,
 			// cancelVoteBtnText: I18nStringKey.kAdminVMButtons_CancelVote,
-			endTurnBtnText: I18nStringKey.kVMButtons_EndTurn,
+			// endTurnBtnText: I18nStringKey.kVMButtons_EndTurn,
 			// qemuMonitorBtnText: I18nStringKey.kQEMUMonitor,
 			// qemuModalHeader: I18nStringKey.kQEMUMonitor,
-			qemuMonitorSendBtn: I18nStringKey.kGeneric_Send,
+			// qemuMonitorSendBtn: I18nStringKey.kGeneric_Send,
 
 			// restoreBtnText: I18nStringKey.kAdminVMButtons_Restore,
 			// rebootBtnText: I18nStringKey.kAdminVMButtons_Reboot,
