@@ -4,6 +4,14 @@
 	padding-left: 0 !important;
 }
 
+.userlist-username, .chat-username-admin, .username {
+    color: #FF0000 !important;
+}
+
+.userlist-username, .chat-username-moderator, .username-moderator {
+    color: #00FF00 !important;
+}
+
 @keyframes slide-down {
     from { transform: translateY(-100%); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }

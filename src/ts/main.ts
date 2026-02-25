@@ -351,7 +351,36 @@ async function openVM(vm: VM): Promise<void> {
 }
 
 function closeVM() {
+	if (VM === null)
+		return;
+	expectedClose = true;
 
+	VM.close();
+	VM = null;
+
+	turn = -1;
+
+	elements.chatList.innerHTML = ''; // Easy fix for the chat list to not go off screen
+	
+	//* VM stuff - What else, I'm a suppose to title this comment
+	elements.vmDisplay.innerHTML = '';
+	elements.vmList.style.display = 'block';
+	elements.vmView.style.display = 'none';
+
+	elements.xssCheckboxContainer.style.display = 'none';
+	elements.xssCheckbox.checked = false;
+	elements.username.classList.remove('username-admin', 'username-moderator', 'username-registered');
+	elements.username.classList.add('username-unregistered');
+	elements.changeUsernameBtn.style.display = 'inline-block';
+
+	users.clear();
+	elements.userList.innerHTML = '';
+	
+	rank = Rank.Unregistered;
+	
+	perms.set(0);
+
+	w.VMName = null;
 }
 
 async function loadList() {
@@ -746,7 +775,17 @@ function doLogin() {
 }
 
 function onLogin(_rank: Rank, _perms: Permissions) {
+	rank = _rank;
+	perms = _perms;
 
+	elements.username.classList.remove('username-unregistered', 'username-registered');
+
+	if (rank === Rank.Admin)
+		elements.username.classList.add('username-admin');
+	if (rank === Rank.Moderator)
+		elements.username.classList.add('username-moderator');
+	if (rank === Rank.Registered)
+		elements.username.classList.add('username-registered');
 }
 
 function userModOptions(user: { user: User; element: HTMLDivElement } ) {

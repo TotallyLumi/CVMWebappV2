@@ -37,7 +37,7 @@
   		</div>
 		</div>
 
-		<nav class="glass sticky top-4 mx-6 px-6 py-3 flex justify-between items-center">
+		<nav class="glass sticky top-4 mx-6 px-6 py-3 flex justify-between items-center z-10">
 			<span class="text-xl font-bold tracking-wider text-zinc-100">
 				<span id="siteNameText"></span>
 			</span>
@@ -78,17 +78,15 @@
 				<div class="flex flex-wrap -mx-4"></div>
 			</div>
 
-			<div id="vmView">
+			<div id="vmView" class="w-full">
 				<section class="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-sm">
 					<div class="p-6 border-b border-zinc-800 flex items-center justify-between">
 						<h2 id="vmName" class="font-semibold text-sm text-zinc-400 uppercase tracking-wider">
 							Virtual Machine
 						</h2>
+						<p id="turnStatus" class="top-3 left-1/2 -translate-x-1/2 bg-zinc-900/80 backdrop-blur-sm px-4 py-1 rounded-lg text-sm text-zinc-300 shadow-md z-50"></p>
 					</div>
-
-					<div id="vmDisplay" class="relative bg-black rounded-b-2xl flex justify-center">
-						<p id="turnStatus" class="absolute top-3 left-1/2 -translate-x-1/2 bg-zinc-900/80 backdrop-blur-sm px-4 py-1 rounded-lg text-sm text-zinc-300 shadow-md"></p>
-					</div>
+					<div id="vmDisplay" class="relative bg-black flex justify-center rounded-2xl"></div>
 				</section>
 
 				<br>
@@ -107,7 +105,7 @@
 							VM Controls
 						</h2>
 					</div>
-					<div class="p-6 flex flex-wrap gap-3 justify-center">
+					<div class="p-3 flex flex-wrap gap-3 justify-center">
 						<button id="takeTurnBtn" class="btn-primary">
 							<i class="fa-solid fa-computer-mouse"></i>
 							<span id="turnBtnText"></span>
@@ -120,13 +118,13 @@
 							<i class="fa-solid fa-signature"></i>
 							<span id="changeUsernameBtnText"></span>
 						</button>
-						<button id="ctrlAltDelBtn" class="btn-primary">
-							<i class="fa-solid fa-gear"></i>
-							<span id="ctrlAltDelBtnText"></span>
-						</button>
 						<button id="voteResetBtn" class="btn-red">
 							<i class="fa-solid fa-rotate-left"></i>
 							<span id="voteForResetBtnText"></span>
+						</button>
+						<button id="ctrlAltDelBtn" class="btn-primary">
+							<i class="fa-solid fa-gear"></i>
+							<span id="ctrlAltDelBtnText"></span>
 						</button>
 						<button id="screenshotBtn" class="btn-primary">
 							<i class="fa-solid fa-camera"></i>
