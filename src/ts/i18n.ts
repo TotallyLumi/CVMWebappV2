@@ -37,6 +37,26 @@ export enum I18nStringKey {
 	kVMButtons_VoteForReset = 'kVMButtons_VoteForReset',
 	kVMButtons_Screenshot = 'kVMButtons_Screenshot',
 
+	// VM admin thingys
+	kQEMUMonitor = 'kQEMUMonitor',
+	kAdminVMButtons_PassVote = 'kAdminVMButtons_PassVote',
+	kAdminVMButtons_CancelVote = 'kAdminVMButtons_CancelVote',
+
+	kAdminVMButtons_Restore = 'kAdminVMButtons_Restore',
+	kAdminVMButtons_Reboot = 'kAdminVMButtons_Reboot',
+	kAdminVMButtons_ClearTurnQueue = 'kAdminVMButtons_ClearTurnQueue',
+	kAdminVMButtons_BypassTurn = 'kAdminVMButtons_BypassTurn',
+	kAdminVMButtons_IndefiniteTurn = 'kAdminVMButtons_IndefiniteTurn',
+	kAdminVMButtons_GhostTurnOn = 'kAdminVMButtons_GhostTurnOn',
+	kAdminVMButtons_GhostTurnOff = 'kAdminVMButtons_GhostTurnOff',
+
+	kAdminVMButtons_Ban = 'kAdminVMButtons_Ban',
+	kAdminVMButtons_Kick = 'kAdminVMButtons_Kick',
+	kAdminVMButtons_TempMute = 'kAdminVMButtons_TempMute',
+	kAdminVMButtons_IndefMute = 'kAdminVMButtons_IndefMute',
+	kAdminVMButtons_Unmute = 'kAdminVMButtons_Unmute',
+	kAdminVMButtons_GetIP = 'kAdminVMButtons_GetIP',
+
 	// Error message thingys
 	kError_UnexpectedDisconnection = 'kError_UnexpectedDisconnection',
 	kError_UsernameTaken = 'kError_UsernameTaken',
@@ -226,19 +246,19 @@ export class I18n {
 			badPasswordAlertText: I18nStringKey.kError_IncorrectPassword,
 			loginModalPasswordText: I18nStringKey.kGeneric_Password,
 			loginButton: I18nStringKey.kGeneric_Login,
-			// passVoteBtnText: I18nStringKey.kAdminVMButtons_PassVote,
-			// cancelVoteBtnText: I18nStringKey.kAdminVMButtons_CancelVote,
-			// endTurnBtnText: I18nStringKey.kVMButtons_EndTurn,
-			// qemuMonitorBtnText: I18nStringKey.kQEMUMonitor,
-			// qemuModalHeader: I18nStringKey.kQEMUMonitor,
-			// qemuMonitorSendBtn: I18nStringKey.kGeneric_Send,
+			//passVoteBtnText: I18nStringKey.kAdminVMButtons_PassVote,
+			//cancelVoteBtnText: I18nStringKey.kAdminVMButtons_CancelVote,
+			endTurnBtnText: I18nStringKey.kVMButtons_EndTurn,
+			//qemuMonitorBtnText: I18nStringKey.kQEMUMonitor,
+			//qemuModalHeader: I18nStringKey.kQEMUMonitor,
+			//qemuMonitorSendBtn: I18nStringKey.kGeneric_Send,
 
-			// restoreBtnText: I18nStringKey.kAdminVMButtons_Restore,
-			// rebootBtnText: I18nStringKey.kAdminVMButtons_Reboot,
-			// clearQueueBtnText: I18nStringKey.kAdminVMButtons_ClearTurnQueue,
-			// bypassTurnBtnText: I18nStringKey.kAdminVMButtons_BypassTurn,
-			// indefTurnBtnText: I18nStringKey.kAdminVMButtons_IndefiniteTurn,
-			// ghostTurnBtnText: I18nStringKey.kAdminVMButtons_GhostTurnOff,
+			restoreBtnText: I18nStringKey.kAdminVMButtons_Restore,
+			rebootBtnText: I18nStringKey.kAdminVMButtons_Reboot,
+			clearQueueBtnText: I18nStringKey.kAdminVMButtons_ClearTurnQueue,
+			bypassTurnBtnText: I18nStringKey.kAdminVMButtons_BypassTurn,
+			indefTurnBtnText: I18nStringKey.kAdminVMButtons_IndefiniteTurn,
+			//ghostTurnBtnText: I18nStringKey.kAdminVMButtons_GhostTurnOff,
 		};
 
 		const kDomAttributeToStringMap = {

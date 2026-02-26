@@ -4,11 +4,15 @@
 	padding-left: 0 !important;
 }
 
-.userlist-username, .chat-username-admin, .username {
+#staffControls {
+    display: none;
+}
+
+span.user-admin .userlist-username, .chat-username-admin, .username-admin {
     color: #FF0000 !important;
 }
 
-.userlist-username, .chat-username-moderator, .username-moderator {
+span.user-moderator .userlist-username, .chat-username-moderator, .username-moderator {
     color: #00FF00 !important;
 }
 

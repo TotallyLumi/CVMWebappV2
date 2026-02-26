@@ -5,6 +5,8 @@ import MuteState from "./cvm/MuteState.js";
 import { I18nStringKey, TheI18n } from "./i18n.js";
 import { Format } from "./format.js";
 
+import * as Utilities from './utilities.js';
+
 import type VM from "./cvm/VM.js";
 import type TurnStatus from "./cvm/TurnStatus.js";
 import type VoteStatus from "./cvm/VoteStatus.js";
@@ -46,6 +48,14 @@ const elements = {
 	voteResetButton: document.getElementById('voteResetButton') as HTMLButtonElement,
 	turnBtnText: document.getElementById('turnBtnText') as HTMLSpanElement,
 
+	//* VM staff buttons
+	restoreBtn: document.getElementById('restoreBtn') as HTMLButtonElement,
+	rebootBtn: document.getElementById('rebootBtn') as HTMLButtonElement,
+	clearQueueBtn: document.getElementById('clearQueueBtn') as HTMLButtonElement,
+	bypassTurnBtn: document.getElementById('bypassTurnBtn') as HTMLButtonElement,
+	endTurnBtn: document.getElementById('endTurnBtn') as HTMLButtonElement,
+	indefTurnBtn: document.getElementById('indefTurnBtn') as HTMLButtonElement,
+	
 	//* VM admin
 	xssCheckboxContainer: document.getElementById('xssCheckboxContainer') as HTMLDivElement,
 	xssCheckbox: document.getElementById('xssCheckbox') as HTMLInputElement,
@@ -55,6 +65,7 @@ const elements = {
 	adminInputVMID: document.getElementById('adminInputVMID') as HTMLInputElement,
 	badPasswordAlert: document.getElementById('badPasswordAlert') as HTMLDivElement,
 	incorrectPasswordDismissBtn: document.getElementById('incorrectPasswordDismissBtn') as HTMLButtonElement,
+	staffControls: document.getElementById('staffControls') as HTMLDivElement,
 };
 
 interface UserEntry {
@@ -284,6 +295,10 @@ async function multicollab(url: string) {
 	}
 }
 
+function generateUsername() {
+	return "guest" + Utilities.Randint(10000, 99999);
+}
+
 async function openVM(vm: VM): Promise<void> {
 	if (VM !== null) return;
 
@@ -340,6 +355,13 @@ async function openVM(vm: VM): Promise<void> {
 		closeVM();
 		throw new Error('Failed to connect to node');
 	}
+
+	//* This is the only way, I could get the usernames to work and get them stored into the browser's cache
+	if (!username) {
+		username = generateUsername();
+		localStorage.setItem('username', username);
+	}
+	elements.username.innerText = username;
 
 	document.title = "CollabVM";
 
@@ -786,12 +808,32 @@ function onLogin(_rank: Rank, _perms: Permissions) {
 		elements.username.classList.add('username-moderator');
 	if (rank === Rank.Registered)
 		elements.username.classList.add('username-registered');
+
+	elements.staffControls.style.display = 'block';
+
+	if (_perms.restore)
+		elements.restoreBtn.style.display = 'inline-block';
+	if (_perms.reboot)
+		elements.rebootBtn.style.display = 'inline-block';
+	if (_perms.bypassturn) {
+		elements.bypassTurnBtn.style.display = 'inline-block';
+		elements.endTurnBtn.style.display = 'inline-block';
+		elements.clearQueueBtn.style.display = 'inline-block';
+	}
+
+	if (_rank === Rank.Admin) {
+		elements.indefTurnBtn.style.display = 'inline-block';
+	}
+
+	if (_perms.xss)
+		elements.xssCheckboxContainer.style.display = 'inline-block';
 }
 
 function userModOptions(user: { user: User; element: HTMLDivElement } ) {
 
 }
 
+// General user actions
 elements.homeBtn.addEventListener('click', () => closeVM());
 elements.sendChatBtn.addEventListener('click', sendChat);
 elements.chatInput.addEventListener('keypress', (e) => {
@@ -816,6 +858,10 @@ elements.screenshotBtn.addEventListener('click', () => {
 		open(URL.createObjectURL(blob!), '_blank');
 	});
 });
+
+// Admin
+elements.restoreBtn.addEventListener('click', () => window.confirm(TheI18n.getString(I18nStringKey.kVMPrompts_AdminRestoreVMPrompt)) && VM?.restore);
+elements.rebootBtn.addEventListener('click', () => VM?.reboot());
 
 // API
 w.collabvm = {

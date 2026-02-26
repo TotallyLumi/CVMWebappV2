@@ -38,6 +38,26 @@ const fallbackLanguage: Language = {
 		"kVMButtons_VoteForReset": 'Vote For Reset',
 		"kVMButtons_Screenshot": 'Screenshot',
 
+		// VM admin thingys
+		"kQEMUMonitor": "QEMU Monitor",
+		"kAdminVMButtons_PassVote": "Pass Vote",
+		"kAdminVMButtons_CancelVote": "Cancel Vote",
+
+		"kAdminVMButtons_Restore": "Restore",
+		"kAdminVMButtons_Reboot": "Reboot",
+		"kAdminVMButtons_ClearTurnQueue": "Clear Turn Queue",
+		"kAdminVMButtons_BypassTurn": "Bypass Turn",
+		"kAdminVMButtons_IndefiniteTurn": "Indefinite Turn",
+		"kAdminVMButtons_GhostTurnOn": "Ghost Turn (On)",
+		"kAdminVMButtons_GhostTurnOff": "Ghost Turn (Off)",
+
+		"kAdminVMButtons_Ban": "Ban",
+		"kAdminVMButtons_Kick": "Kick",
+		"kAdminVMButtons_TempMute": "Temporary Mute",
+		"kAdminVMButtons_IndefMute": "Indefinite Mute",
+		"kAdminVMButtons_Unmute": "Unmute",
+		"kAdminVMButtons_GetIP": "Get IP",
+
 		// Error thingys
 		"kError_UnexpectedDisconnection": "You have been disconnected from the server.",
 		"kError_UsernameTaken": "That username is already taken",
